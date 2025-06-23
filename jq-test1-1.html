@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+    #prod {
+    width: 400px;
+    height: 400px;
+    }
+    </style>
+    <script>
+    $(function(){
+        $("#ch").mouseover(function(){
+            $("#i").attr("src","images/prod3.jpg")
+        });
+        $("#ch").mouseout(function(){
+            $("#i").attr("src","images/prod2.jpg")
+        });
+        $("#check1").click(function(){
+            $("#prod").fadeIn("slow")
+        });
+        $("#check2").click(function(){
+            $("#prod").fadeOut("slow")
+        });
+    });
+    </script>
+</head>
+<body>
+   <div id="ch">
+   <img src="images/prod2.jpg" alt="" id="i" width="400" height="400">
+   </div>
+   <input type="button" value="다운" id="check1">
+   <input type="button" value="업" id="check2">
+   <br><br>
+   <img src="images/prod2.jpg" alt="" id="prod" style="display: none;position:relative;">
+    
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HJB의 홈페이지</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bxslider@4.2.17/dist/jquery.bxslider.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bxslider@4.2.17/dist/jquery.bxslider.min.js"></script>
+    <script>
+    $(function(){
+        $('.slider').bxSlider();
+        $(".navi>li").mouseover(function(){
+        $(this).find(".submenu").stop().slideDown(500);
+        }); 
+        $(".navi>li").mouseout(function(){
+        $(this).find(".submenu").stop().slideUp(500);
+        });
+        $(".notice").mouseover(function(){
+            $("#op1").css("opacity", "0.7");
+        });
+        $(".notice").mouseout(function(){
+            $("#op1").css("opacity", "1.0");
+        });
+        $(".banner1").mouseover(function(){
+            $("#op2").attr("src","images/nature1.jpg");
+            
+        });
+        $(".banner1").mouseout(function(){
+            $("#op2").attr("src","images/nature5.jpg");
+            
+        });
+         $(".banner2").mouseover(function(){
+            $("#op3").fadeIn("slow");
+            
+        });
+        $(".banner2").mouseout(function(){
+            $("#op3").fadeOut("slow");
+            
+        });
+//모달
+        $("#m").click(function(event){ // event 객체를 인자로 받습니다.
+            event.preventDefault(); // 기본 링크 동작 방지
+            $("#modal").addClass("active");
+        });
+        $(".btn").click(function(){
+            $("#modal").removeClass("active");
+        });
+        
+        
+      });
+    </script>
+    <style>
+        .logo{
+            position: relative;
+            float: left;
+            margin-left: 30px;
+        }
+        #s-menu{
+        position: absolute;
+        top: 50px;
+        right:10px;
+        float:right;
+        }
+        footer ul{
+            list-style: none;
+            text-align: center;
+        }
+/*모달*/
+        #modal{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 1;
+            display: none;
+        }
+        #modal.active{
+            display: block;
+        }
+        .modal_up{
+            width: 800px;
+            height: 500px;
+            position: fixed;
+            left: 20%;
+            top:25%;
+            background-color: #fff;
+        }
+        .uptitle{
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 30px;
+            line-height: 16px;
+        }
+        .upbody{
+            text-align: center;
+            line-height: 30px;
+            padding: 30px;
+        }
+        .btn{
+            width: 80px; height: 30px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 3px;
+            background-color: #5e1742;
+            position: absolute;
+            left: 350px;
+            bottom: 30px;
+            line-height: 30px;
+        }
+        
+    
+    </style>
+</head>
+<body>
+   <header>
+       <div class="logo">
+           <img src="images/logo.jpg" alt="" width="230px" height="90px">
+       </div>
+       <div id="s-menu">
+           <a href="login.html">로그인</a> | <a href="#">회원가입</a> | 
+           <a href="#">마이페이지</a> | <a href="#">이용안내</a> | 
+           <a href="#">고객센터</a>
+       </div>
+   </header>
+   <nav>
+   <!--메뉴-->
+   <ul class="navi">
+       <li>
+           <a href="">수업미션</a>
+<!--서부메뉴-->
+          <ul class="submenu">
+          <li><a href="table.html" target="ifr">미션1-테이블</a></li>
+          <li><a href="product.html" target="ifr">미션2-상품소개</a></li>
+          <li><a href="box.html" target="ifr">미션3-박스모델</a></li>
+          <li><a href="position.html">미션4-포지션</a></li>
+          <li><a href="z-Index.htm">미션5-지인덱스</a></li>
+      </ul>
+    </li>
+    <li>
+        <a href="">나의작픔</a>
+       <ul class="submenu">
+          <li><a href="popup.html">작품1</a></li>
+          <li><a href="semantic.html">작품2</a></li>
+          <li><a href="video.html">작품3</a></li>
+          <li><a href="">작품4</a></li>
+          <li><a href="">작품5</a></li>
+      </ul>
+    </li>
+    <li><a href="" id="m">모달</a>
+       <ul class="submenu">
+          <li><a href="">긴바지</a></li>
+          <li><a href="">니트</a></li>
+          <li><a href="">짧은바지</a></li>
+          <li><a href="">스커트</a></li>
+          <li><a href="">데님</a></li>
+      </ul>
+      </li>
+       
+       <li><a href="">로그인/회원가입</a>
+       <ul class="submenu">
+          <li><a href="login.html">로그인</a></li>
+          <li><a href="fieldset.html">회원가입</a></li>
+          <li><a href="member.html">사이트맵</a></li>
+          <li><a href="">이미지맵</a></li>
+          <li><a href="">레시피</a></li>
+      </ul>
+      </li>
+       
+   </ul>
+   </nav>
+   <section>
+       <iframe src="main.html" frameborder="0" width="100%" height="600px" name="ifr"></iframe>
+   </section>
+<!--   모달-->
+  <div id="modal">
+     <div class="modal_up">
+         <div class="uptitle">포장 배달 가능</div>
+         <div class="upbody"><img src="images/strawberries.jpg" width="600" height="350" alt=""></div>
+         <div class="btn">닫기</div>
+     </div>
+      
+  </div>
+   <div style="clear:both;"></div>
+   <footer>
+       <p>2025 Sejong Cyber University's HJB All Rights Reserved</p>
+       <ul>
+           <li>05000 서울 특별시 광진구 군자로 121 세종대학교</li>
+           <li>대표자 : 신구</li>
+           <li>전화번호 : 02-2204-8000</li>
+           <li>팩스 : 02-2204-8036</li>
+           <li>이메일 : webmaster@sjcu.ac.kr</li>
+       </ul>
+   </footer>
+</body>
+</html>

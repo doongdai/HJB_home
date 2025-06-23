@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+    $(function(){
+        $("button").click(function(){
+            $("#dog").show().fadeOut("slow").slideDown("slow");
+        });
+      
+    });
+    </script>
+</head>
+<body>
+   <button>버튼</button><br>
+   <img src="images/dog.jpg" alt="" id="dog" style="display: none;position: relative;" width="500px" height="500px">
+    
+</body>
+</html>
