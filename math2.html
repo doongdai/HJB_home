@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>작품5 - 수놀이2</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 높이만큼 */
+            flex-direction: column;
+            font-family: 'Comic Sans MS', sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        .bg-overlay {
+            background-image: url('images/rocket.png'); /* 이미지 경로 확인 */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        body * {
+            color: red; /* 기본 글자색, 필요에 따라 개별 요소에 설정 */
+        }
+
+        section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        label, input {
+            font-size: 2rem;
+            margin: 10px;
+        }
+
+        input[type="number"] {
+            width: 120px;
+            height: 60px;
+            font-size: 2rem;
+            text-align: center;
+            border-radius: 12px;
+            border: 3px solid #888;
+        }
+
+        button {
+            font-size: 2rem;
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 15px;
+            background-color: blue;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #ff7f00;
+            transform: scale(1.05);
+        }
+
+        #result {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: navy;
+            margin-top: 20px;
+        }
+
+        .quiz-area {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        /* 팝업창 스타일 */
+        .popup-overlay {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* background: rgba(0, 0, 0, 0.1); /* 선택 사항: 배경을 약간 어둡게 하고 싶을 때 */
+            pointer-events: none; /* 이 부분이 중요! 오버레이는 클릭 이벤트를 통과시킵니다. */
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: absolute; /* 절대 위치 사용 */
+            top: 20px; /* 위에서 20px 떨어진 위치 */
+            right: 20px; /* 오른쪽에서 20px 떨어진 위치 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 추가로 입체감 부여 */
+            display: flex; /* 내부 요소 정렬을 위해 flex 사용 */
+            flex-direction: column; /* 세로 정렬 */
+            justify-content: space-between; /* 내용과 버튼을 위아래로 분리 */
+            align-items: center; /* 가운데 정렬 */
+            gap: 15px; /* 이미지와 버튼 사이 간격 */
+            pointer-events: auto; /* 팝업 콘텐츠 자체는 클릭에 반응해야 하므로 auto로 설정 */
+        }
+
+        .popup-content img {
+            width: 100px; /* 이미지 크기 조절 */
+            height: 100px; /* 이미지 크기 조절 */
+            margin: 5px; /* 이미지 간격 조절 */
+            object-fit: contain;
+        }
+
+        /* 새로 추가된 X 닫기 버튼 스타일 (팝업창 안에 위치) */
+        .close-x-button {
+            position: absolute; /* 팝업 콘텐츠 내에서 절대 위치 */
+            top: 10px; /* 팝업 상단에서 10px 떨어짐 */
+            right: 15px; /* 팝업 오른쪽에서 15px 떨어짐 */
+            font-size: 2.5rem; /* X 아이콘 크기 */
+            color: #999; /* 색상 */
+            cursor: pointer;
+            background: none; /* 배경 없음 */
+            border: none; /* 테두리 없음 */
+            padding: 0; /* 패딩 없음 */
+            line-height: 1; /* 줄 높이 */
+            transition: color 0.2s;
+        }
+
+        .close-x-button:hover {
+            color: #333; /* 호버 시 색상 변경 */
+        }
+
+        /* 기존 "창 닫기" 버튼 스타일 (팝업창 아래 위치) */
+        .close-button-bottom {
+            font-size: 1.0rem; /* 버튼 폰트 크기 */
+            padding: 5px 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #f44336; /* 빨간색 계열 */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .close-button-bottom:hover {
+            background-color: #d32f2f; /* 호버 시 색상 변경 */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="quiz-area">
+        <h2>🎨 작품5(0 부터 9 까지 수 익히는 수놀이)</h2>
+
+        <h3>🔢 사용해보기</h3>
+        <p>버튼을 눌러 딸기나 쿠키를 확인하고 개수를 입력해 보세요.</p>
+
+        <button onclick="showCountingPopup()">눌러주세요</button><br>
+        <label>딸기나 쿠키가 몇 개일까요?: <input type="number" id="answer" min="0" max="9"></label><br>
+        <button onclick="checkAnswer()">결과 확인</button>
+        <button onclick="resetQuiz()">처음으로</button>
+
+        <p id="result" style="font-weight: bold; color: navy;"></p>
+
+        <audio id="correctSound" src="sounds/correct.mp3"></audio>
+        <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+    </div>
+
+    <div class="popup-overlay" id="countingPopupOverlay">
+        <div class="popup-content">
+            <button class="close-x-button" onclick="hideCountingPopup()">&times;</button>
+            <p style="font-size: 2.5rem; color: #333; font-weight: bold;">몇 개인지 세어보세요!</p>
+            <div id="imageContainer" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+                </div>
+            <button class="close-button-bottom" onclick="hideCountingPopup()">창 닫기</button>
+        </div>
+    </div>
+
+    <script>
+        let correctCount = 0; // 랜덤으로 생성된 개수를 저장할 변수
+
+        function showCountingPopup() {
+            const popupOverlay = document.getElementById("countingPopupOverlay");
+            const imageContainer = document.getElementById("imageContainer");
+            imageContainer.innerHTML = ''; // 이전 이미지들 초기화
+
+            // 0에서 9 사이의 랜덤 숫자 생성
+            correctCount = Math.floor(Math.random() * 10);
+
+            // 딸기 또는 쿠키 이미지를 랜덤으로 선택
+            const imagePath = Math.random() < 0.5 ? 'images/strawberry3.jpg' : 'images/cookie.jpg'; // 이미지 경로 확인
+
+            for (let i = 0; i < correctCount; i++) {
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = '세는 대상';
+                imageContainer.appendChild(img);
+            }
+
+            popupOverlay.style.display = 'flex'; // 팝업창 표시
+        }
+
+        function hideCountingPopup() {
+            document.getElementById("countingPopupOverlay").style.display = 'none'; // 팝업창 숨김
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById("answer").value);
+            const result = document.getElementById("result");
+
+            const correctSound = document.getElementById("correctSound");
+            const wrongSound = document.getElementById("wrongSound");
+
+            if (isNaN(userAnswer) || userAnswer < 0 || userAnswer > 9) {
+                result.innerText = "❗ 숫자를 0~9 사이로 입력해 주세요!";
+                return;
+            }
+
+            if (userAnswer === correctCount) {
+                result.innerText = "🎉 정답이에요! 잘했어요!";
+                correctSound.pause();
+                correctSound.currentTime = 0;
+                correctSound.play();
+            } else {
+                result.innerText = `😢 틀렸어요! 정답은 ${correctCount} 개예요!`;
+                wrongSound.pause();
+                wrongSound.currentTime = 0;
+                wrongSound.play();
+            }
+        }
+
+        function resetQuiz() {
+            document.getElementById("answer").value = "";
+            document.getElementById("result").innerText = "";
+            document.getElementById("imageContainer").innerHTML = ''; // 팝업창 이미지 초기화
+            hideCountingPopup(); // 팝업창 숨김 확인
+            
+            document.getElementById("correctSound").pause();
+            document.getElementById("correctSound").currentTime = 0;
+            document.getElementById("wrongSound").pause();
+            document.getElementById("wrongSound").currentTime = 0;
+        }
+    </script>
+</body>
+</html>

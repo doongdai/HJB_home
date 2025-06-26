@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>작품4 - 수놀이1</title>
+    <style>
+        body {
+            display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 화면 높이만큼 */
+  flex-direction: column;
+            
+  font-family: 'Comic Sans MS', sans-serif;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.bg-overlay {
+  background-image: url('images/rocket.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+body * {
+  color: red;
+}
+  section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  label, input {
+    font-size: 2rem;
+    margin: 10px;
+  }
+
+  input[type="number"] {
+    width: 120px;
+    height: 60px;
+    font-size: 2rem;
+    text-align: center;
+    border-radius: 12px;
+    border: 3px solid #888;
+  }
+
+  button {
+    font-size: 2rem;
+    padding: 15px 30px;
+    margin: 10px;
+    border: none;
+    border-radius: 15px;
+    background-color:blue;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  button:hover {
+    background-color: #ff7f00;
+    transform: scale(1.05);
+  }
+
+  #result {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: navy;
+    margin-top: 20px;
+  }
+
+  .quiz-area {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 30px;
+    display: inline-block;
+  }
+    </style>
+</head>
+<body>
+  <div class="bg-overlay"></div>
+  <div class="quiz-area">
+   
+   <h2>🎨 작품4(1 부터 18 까지 수 익히는수놀이)</h2>
+
+  
+
+  <h3>🔢 사용해보기</h3>
+  <p>0~9 사이의 두 숫자를 입력하고 정답을 맞혀보세요.</p>
+
+  <label>첫 번째 수: <input type="number" id="num1" min="0" max="9"></label><br>
+  <label>두 번째 수: <input type="number" id="num2" min="0" max="9"></label><br>
+  <label>합 입력: <input type="number" id="answer"></label><br>
+  <button onclick="checkAnswer()">결과 확인</button>
+  <button onclick="resetQuiz()">처음으로</button>
+
+  <p id="result" style="font-weight: bold; color: navy;"></p>
+  <audio id="correctSound" src="sounds/correct.mp3"></audio>
+<audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+
+  <script>
+      function checkAnswer() {
+    const num1 = parseInt(document.getElementById("num1").value);
+    const num2 = parseInt(document.getElementById("num2").value);
+    const answer = parseInt(document.getElementById("answer").value);
+    const result = document.getElementById("result");
+
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+
+    if (
+      isNaN(num1) || isNaN(num2) || isNaN(answer) ||
+      num1 < 0 || num1 > 9 || num2 < 0 || num2 > 9
+    ) {
+      result.innerText = "❗ 숫자를 0~9 사이로 모두 입력해 주세요!";
+      return;
+    }
+
+    const actual = num1 + num2;
+
+    if (answer === actual) {
+      result.innerText = "🎉 정답이에요! 잘했어요!";
+      correctSound.pause();
+      correctSound.currentTime = 0;
+      correctSound.play();
+    } else {
+      result.innerText = `😢 틀렸어요! 정답은 ${actual} 이에요!`;
+      wrongSound.pause();
+      wrongSound.currentTime = 0;
+      wrongSound.play();
+    }
+  }
+
+  function resetQuiz() {
+    document.getElementById("num1").value = "";
+    document.getElementById("num2").value = "";
+    document.getElementById("answer").value = "";
+    document.getElementById("result").innerText = "";
+
+    document.getElementById("correctSound").pause();
+    document.getElementById("correctSound").currentTime = 0;
+    document.getElementById("wrongSound").pause();
+    document.getElementById("wrongSound").currentTime = 0;
+  }
+  </script>
+   <audio id="correctSound" src="sounds/correct.mp3"></audio>
+<audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+   
+    </div>
+</body>
+</html>
