@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>작품6 - 수놀이3 (묶어세기 & 곱셈)</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 높이만큼 */
+            flex-direction: column;
+            font-family: 'Comic Sans MS', sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden; /* 스크롤바 제거 */
+        }
+
+        .bg-overlay {
+            background-image: url('images/rocket.png'); /* 이미지 경로 확인 */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        body * {
+            color: red; /* 기본 글자색, 필요에 따라 개별 요소에 설정 */
+        }
+
+        /* 메인 퀴즈 영역 스타일 */
+        .quiz-area {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 30px;
+            display: inline-block;
+            text-align: center; /* 내부 요소들을 중앙 정렬 */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* 그림자 효과 */
+            max-width: 90%; /* 모바일에서도 잘 보이도록 최대 너비 설정 */
+            margin-top: 50px; /* 팝업창 위치를 고려한 상단 여백 */
+        }
+
+        h2, h3 {
+            color: blue; /* 제목 색상 조정 */
+            margin-bottom: 20px;
+        }
+
+        label, input {
+            font-size: 2rem;
+            margin: 10px;
+            display: block; /* 각 레이블과 입력칸을 세로로 정렬 */
+            text-align: left; /* 텍스트 정렬 */
+            width: fit-content; /* 내용에 맞춰 너비 조절 */
+            margin-left: auto; /* 중앙 정렬 */
+            margin-right: auto; /* 중앙 정렬 */
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 150px; /* 너비 조정 */
+            height: 60px;
+            font-size: 2rem;
+            text-align: center;
+            border-radius: 12px;
+            border: 3px solid #888;
+            padding: 0 10px; /* 내부 여백 */
+        }
+        
+        .equation-input {
+            width: 250px; /* 곱셈식 입력에 필요한 너비 */
+            text-align: left; /* 텍스트 정렬 */
+            padding-left: 10px;
+        }
+
+        button {
+            font-size: 2rem;
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 15px;
+            background-color: blue;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 버튼 그림자 */
+        }
+
+        button:hover {
+            background-color: #ff7f00;
+            transform: scale(1.05);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none; /* 비활성화 시 호버 효과 제거 */
+            box-shadow: none;
+        }
+
+        #result {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: navy;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0f7fa; /* 결과창 배경색 */
+            border-radius: 10px;
+        }
+
+        /* 팝업창 공통 스타일 */
+        .popup-overlay {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* 어두운 배경 */
+            z-index: 1000;
+            pointer-events: auto; /* 팝업 오버레이 자체는 클릭에 반응하도록 */
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px; /* 팝업 최대 너비 */
+            max-height: 90vh; /* 팝업 최대 높이 (뷰포트 높이의 90%) */
+            overflow-y: auto; /* 내용이 많으면 스크롤 */
+            position: absolute; /* 절대 위치 사용 */
+            top: 20px; /* 위에서 20px 떨어진 위치 */
+            right: 20px; /* 오른쪽에서 20px 떨어진 위치 */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* 그림자 추가로 입체감 부여 */
+            display: flex; /* 내부 요소 정렬을 위해 flex 사용 */
+            flex-direction: column; /* 세로 정렬 */
+            justify-content: space-between; /* 내용과 버튼을 위아래로 분리 */
+            align-items: center; /* 가운데 정렬 */
+            gap: 15px; /* 내부 요소들 사이의 간격 */
+            pointer-events: auto; /* 팝업 콘텐츠 자체는 클릭에 반응해야 하므로 auto로 설정 */
+        }
+        /* 모바일 환경에서 팝업창 위치 조정 */
+        @media (max-width: 600px) {
+            .popup-content {
+                top: 10px;
+                right: 10px;
+                left: 10px; /* 모바일에서는 너비를 꽉 채우도록 */
+                max-width: none; /* 모바일에서는 최대 너비 제한 해제 */
+                padding: 20px;
+            }
+        }
+
+
+        /* 팝업창 닫기 X 버튼 */
+        .close-x-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #555;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .close-x-button:hover {
+            color: #f00;
+            transform: scale(1.1);
+        }
+
+        /* 팝업창 하단 닫기 버튼 */
+        .close-button-bottom {
+            font-size: 1.5rem; /* 폰트 크기 조정 */
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #f44336; /* 빨간색 계열 */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .close-button-bottom:hover {
+            background-color: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        /* 묶어 세기 선택 팝업 내 버튼 스타일 */
+        .grouping-button {
+            font-size: 1.5rem;
+            padding: 12px 25px;
+            margin: 8px; /* 버튼 간 간격 */
+            border: none;
+            border-radius: 12px;
+            background-color: #6a5acd; /* 보라색 계열 */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            flex: 1 1 auto; /* 내용에 따라 유연하게 크기 조절 */
+            min-width: 120px; /* 최소 너비 */
+            max-width: 200px; /* 최대 너비 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grouping-button:hover {
+            background-color: #483d8b;
+            transform: scale(1.05);
+        }
+
+        /* 팝업창 내 이미지 컨테이너 (묶음 정렬) */
+        #imageContainer {
+            display: flex;
+            flex-wrap: wrap; /* 이미지가 넘치면 다음 줄로 */
+            justify-content: center; /* 묶음들을 중앙 정렬 */
+            align-items: flex-start; /* 묶음들이 위에서부터 정렬 */
+            gap: 10px; /* 묶음 div 간의 간격 */
+            padding: 10px;
+            max-width: 100%; /* 팝업 내용 너비에 맞춰 조절 */
+            overflow-y: auto; /* 내용 많으면 스크롤 */
+        }
+
+        /* 개별 묶음(div) 스타일 */
+        .image-group {
+            display: flex; /* 묶음 내 이미지들을 가로로 정렬 */
+            flex-wrap: wrap; /* 한 묶음 내에서도 넘치면 다음 줄로 */
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #ccc; /* 묶음 구분선 */
+            padding: 5px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-width: 80px; /* 묶음 div의 최소 너비 */
+            max-width: calc(100% / 3 - 20px); /* 한 줄에 3개 정도 보이도록 (대략) */
+            box-sizing: border-box; /* 패딩, 보더가 너비에 포함되도록 */
+        }
+        /* 이미지 크기 조절 */
+        .image-group img {
+            width: 100%; /* 묶음 div 안에 꽉 차도록 */
+            height: auto; /* 비율 유지 */
+            max-width: 100px; /* 최대 크기 설정 (묶음 이미지 자체가 클 경우) */
+            max-height: 100px; /* 최대 크기 설정 */
+            margin: 0; /* 이미지 간 간격 없음 (묶음 이미지는 하나만 들어가므로) */
+            object-fit: contain;
+
+        /* 0개일 때 텍스트 스타일 */
+        .zero-text {
+            font-size: 2rem;
+            color: blue;
+            font-weight: bold;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="quiz-area">
+        <h2>🎨 작품6 (1개씩 묶어 세기 부터 9개씩 묶어 세기까지)</h2>
+
+        <h3>🔢 곱셈 구구단 연습</h3>
+        <p>묶어 세기 단위를 선택하고 그림을 확인한 후 개수와 곱셈식을 입력해 보세요.</p>
+
+        <!-- 묶어 세기 단위 선택 버튼 -->
+        <button onclick="showGroupingOptionPopup()">묶어 세기 선택</button>
+        <br>
+
+        <!-- 시작 버튼: 묶음 그림 팝업 열기 -->
+        <button id="startButton" onclick="showCountingPopup()" disabled>시작</button>
+        <br>
+
+        <!-- 총 개수 입력 필드 -->
+        <label id="totalCountLabel" style="display:none;">총 몇 개일까요?: <input type="number" id="totalCountAnswer" min="0" max="81"></label><br>
+        
+        <!-- 곱셈식 입력 필드 -->
+        <label id="equationLabel" style="display:none;">곱셈식은? (예: 1x7=7): <input type="text" id="equationAnswer" class="equation-input"></label><br>
+        
+        <button onclick="checkAnswer()">결과 확인</button>
+        <button onclick="resetQuiz()">처음으로</button>
+
+        <p id="result" style="font-weight: bold; color: navy;"></p>
+
+        <audio id="correctSound" src="sounds/correct.mp3"></audio>
+        <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+    </div>
+
+<!-- 묶어 세기 단위 선택 팝업창 -->
+<div class="popup-overlay" id="groupingOptionPopupOverlay">
+    <div class="popup-content">
+        <button class="close-x-button" onclick="hideGroupingOptionPopup()">&times;</button>
+        <p style="font-size: 2.5rem; color: #333; font-weight: bold;">몇 개씩 묶어 세기를 할까요?</p>
+        <div id="groupingButtonsContainer" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+            <!-- JavaScript로 묶어 세기 버튼들이 여기에 삽입됩니다 -->
+        </div>
+        <button class="close-button-bottom" onclick="hideGroupingOptionPopup()">닫기</button>
+    </div>
+</div>
+
+<!-- 그림을 보여주는 팝업창 -->
+<div class="popup-overlay" id="countingPopupOverlay">
+    <div class="popup-content">
+        <button class="close-x-button" onclick="hideCountingPopup()">&times;</button>
+        <p style="font-size: 2.5rem; color: #333; font-weight: bold;">몇 개인지 세어보세요!</p>
+        <div id="imageContainer">
+            <!-- JavaScript로 이미지가 여기에 삽입됩니다 -->
+        </div>
+        <button class="close-button-bottom" onclick="hideCountingPopup()">창 닫기</button>
+    </div>
+</div>
+
+<script>
+// 전역 변수
+let groupingUnit = 0; // 선택된 묶어 세기 단위 (1~9)
+let numberOfGroups = 0; // 랜덤으로 생성된 묶음의 개수 (0~9)
+let correctTotalCount = 0; // 총 개수 (묶어 세기 단위 * 묶음 개수)
+
+// DOM 요소 참조 (변수로 저장하여 효율성 높임)
+const startButton = document.getElementById("startButton");
+const totalCountLabel = document.getElementById("totalCountLabel");
+const totalCountAnswerInput = document.getElementById("totalCountAnswer");
+const equationLabel = document.getElementById("equationLabel");
+const equationAnswerInput = document.getElementById("equationAnswer");
+const resultDisplay = document.getElementById("result");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+
+// 팝업 오버레이
+const groupingOptionPopupOverlay = document.getElementById("groupingOptionPopupOverlay");
+const countingPopupOverlay = document.getElementById("countingPopupOverlay");
+const groupingButtonsContainer = document.getElementById("groupingButtonsContainer");
+const imageContainer = document.getElementById("imageContainer");
+
+
+// 1. 묶어 세기 선택 팝업창 열기
+function showGroupingOptionPopup() {
+    groupingButtonsContainer.innerHTML = ''; // 이전 버튼들 초기화
+
+    // 1개씩 묶어 세기부터 9개씩 묶어 세기까지 버튼 생성
+    for (let i = 1; i <= 9; i++) {
+        const button = document.createElement('button');
+        button.innerText = `${i}개씩 묶어 세기`;
+        button.className = 'grouping-button';
+        button.onclick = () => selectGroupingUnit(i); // 클릭 시 단위 선택 함수 호출
+        groupingButtonsContainer.appendChild(button);
+    }
+
+    groupingOptionPopupOverlay.style.display = 'flex'; // 팝업창 표시
+
+    // 시작 버튼, 입력 필드 및 결과 초기화/숨김
+    startButton.disabled = true;
+    totalCountLabel.style.display = 'none';
+    totalCountAnswerInput.style.display = 'none';
+    equationLabel.style.display = 'none';
+    equationAnswerInput.style.display = 'none';
+    resultDisplay.innerText = "";
+}
+
+// 2. 묶어 세기 단위 선택 함수
+function selectGroupingUnit(unit) {
+    groupingUnit = unit; // 선택된 단위를 전역 변수에 저장
+    hideGroupingOptionPopup(); // 팝업창 닫기
+    startButton.disabled = false; // 시작 버튼 활성화
+    alert(`${groupingUnit}개씩 묶어 세기를 선택했습니다. 이제 '시작' 버튼을 눌러주세요!`); // 사용자에게 알림
+    resetInputsAndResult(); // 입력 필드 초기화 및 숨기기
+}
+
+// 3. 묶어 세기 선택 팝업창 닫기
+function hideGroupingOptionPopup() {
+    groupingOptionPopupOverlay.style.display = 'none';
+}
+
+
+// 4. 그림을 보여주는 팝업창 열기 (showCountingPopup 함수 수정)
+function showCountingPopup() {
+    if (groupingUnit === 0) {
+        alert("먼저 '묶어 세기 선택' 버튼을 눌러 묶어 세기 단위를 선택해주세요!");
+        return;
+    }
+
+    imageContainer.innerHTML = ''; // 이전 이미지들 초기화
+
+    // 0~9 묶음 중 랜덤으로 묶음 개수 생성
+    // 묶음 개수가 0인 경우도 허용합니다. (0개부터 9개 묶음까지)
+    numberOfGroups = Math.floor(Math.random() * 10); 
+    correctTotalCount = groupingUnit * numberOfGroups; // 실제 총 개수
+
+    // 묶어 세기 단위에 해당하는 과일 이미지 경로 설정
+    let imageFileName = `fruit${groupingUnit}`;
+    let imageExtension = '.png';
+    // fruit2와 fruit4는 .jpg 형식
+    if (groupingUnit === 2 || groupingUnit === 4) {
+        imageExtension = '.jpg';
+    }
+    const imagePath = `images/${imageFileName}${imageExtension}`;
+    
+
+    // 묶음 단위로 이미지 표시
+    if (numberOfGroups === 0) {
+        // 묶음 개수가 0개일 때
+        const zeroText = document.createElement('p');
+        zeroText.innerText = "0개입니다!";
+        zeroText.className = 'zero-text';
+        imageContainer.appendChild(zeroText);
+    } 
+    else {
+        // 묶음의 개수만큼 반복하여 각 묶음 div를 생성
+        for (let i = 0; i < numberOfGroups; i++) {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'image-group'; // 묶음 구분을 위한 클래스
+
+            // 묶음 이미지 (fruitX.png 또는 fruitX.jpg)를 한 번만 추가
+            const img = document.createElement('img');
+            img.src = imagePath; // 선택된 묶음 단위에 맞는 과일 이미지 사용
+            img.alt = `${groupingUnit}개 묶음`; // alt 텍스트도 묶음 정보 포함
+            groupDiv.appendChild(img);
+            
+            imageContainer.appendChild(groupDiv);
+        }
+    }
+
+    countingPopupOverlay.style.display = 'flex'; // 그림 팝업창 표시
+
+    // 입력 필드 다시 표시
+    totalCountLabel.style.display = 'block';
+    totalCountAnswerInput.style.display = 'block';
+    equationLabel.style.display = 'block';
+    equationAnswerInput.style.display = 'block';
+
+    // 입력 필드 초기화
+    totalCountAnswerInput.value = "";
+    equationAnswerInput.value = "";
+    totalCountAnswerInput.focus(); // 첫 번째 입력창에 포커스
+}
+
+// 5. 그림 팝업창 닫기
+function hideCountingPopup() {
+    countingPopupOverlay.style.display = 'none';
+}
+
+// 6. 정답 확인 (checkAnswer 함수 수정)
+function checkAnswer() {
+    const userAnswerCount = parseInt(totalCountAnswerInput.value);
+    const userAnswerEquation = equationAnswerInput.value.trim(); // 공백 제거
+
+    let isCountCorrect = false;
+    let isEquationCorrect = false;
+
+    // 1) 총 개수 확인
+    if (isNaN(userAnswerCount) || userAnswerCount < 0 || userAnswerCount > 81) { // 9*9=81까지 허용
+        resultDisplay.innerText = "❗ 총 개수는 0~81 사이의 숫자로 입력해 주세요!";
+        playWrongSound();
+        return;
+    }
+    if (userAnswerCount === correctTotalCount) {
+        isCountCorrect = true;
+    }
+
+    // 2) 곱셈식 확인 (예: 1x7=7)
+    // 올바른 곱셈식 예시: "묶어세기단위 x 묶음개수 = 총개수"
+    const correctEquation = `${groupingUnit}x${numberOfGroups}=${correctTotalCount}`;
+
+    if (userAnswerEquation === correctEquation) {
+        isEquationCorrect = true;
+    } else {
+        // 유연한 검증 (예: 1*7=7, 1* 7 = 7 등)
+        const simplifiedUserEquation = userAnswerEquation.replace(/\s/g, '').replace(/\*/g, 'x'); // 공백 제거, *를 x로 통일
+        if (simplifiedUserEquation === correctEquation) {
+            isEquationCorrect = true;
+        }
+    }
+
+    // 결과 출력
+    if (isCountCorrect && isEquationCorrect) {
+        resultDisplay.innerText = "🎉 정답이에요! 아주 잘했어요!";
+        playCorrectSound();
+    } else if (isCountCorrect && !isEquationCorrect) {
+        resultDisplay.innerText = `😢 총 개수는 맞았지만, 곱셈식이 틀렸어요! 정답 곱셈식은 ${correctEquation} 입니다.`;
+        playWrongSound();
+    } else if (!isCountCorrect && isEquationCorrect) {
+        resultDisplay.innerText = `😢 곱셈식은 맞았지만, 총 개수가 틀렸어요! 정답은 ${correctTotalCount} 개 입니다.`;
+        playWrongSound();
+    }
+    else {
+        resultDisplay.innerText = `😢 틀렸어요! 정답은 ${correctTotalCount} 개이고, 곱셈식은 ${correctEquation} 입니다.`;
+        playWrongSound();
+    }
+}
+
+// 7. 처음으로 초기화 (resetQuiz 함수 수정)
+function resetQuiz() {
+    totalCountAnswerInput.value = "";
+    equationAnswerInput.value = "";
+    resultDisplay.innerText = "";
+    imageContainer.innerHTML = ''; // 그림 팝업창 이미지 초기화
+
+    hideCountingPopup(); // 그림 팝업창 숨김
+    hideGroupingOptionPopup(); // 묶어 세기 선택 팝업 숨김
+
+    groupingUnit = 0; // 묶어 세기 단위 초기화
+    numberOfGroups = 0; // 묶음 개수 초기화
+    correctTotalCount = 0; // 총 개수 초기화
+
+    startButton.disabled = true; // 시작 버튼 비활성화
+
+    // 입력 필드 및 레이블 숨김
+    totalCountLabel.style.display = 'none';
+    totalCountAnswerInput.style.display = 'none';
+    equationLabel.style.display = 'none';
+    equationAnswerInput.style.display = 'none';
+
+    stopSounds(); // 사운드 정지
+}
+
+// 사운드 재생 함수 (중복 코드 방지)
+function playCorrectSound() {
+    correctSound.pause();
+    correctSound.currentTime = 0;
+    correctSound.play();
+}
+
+function playWrongSound() {
+    wrongSound.pause();
+    wrongSound.currentTime = 0;
+    wrongSound.play();
+}
+
+function stopSounds() {
+    correctSound.pause();
+    correctSound.currentTime = 0;
+    wrongSound.pause();
+    wrongSound.currentTime = 0;
+}
+
+// 초기 로드 시 모든 상태를 초기화
+window.onload = function() {
+    resetQuiz();
+};
+
+// 입력 필드와 결과창을 초기화하고 숨기는 함수 (사용자 선택 후 바로 초기화 위함)
+function resetInputsAndResult() {
+    totalCountAnswerInput.value = "";
+    equationAnswerInput.value = "";
+    resultDisplay.innerText = "";
+    totalCountLabel.style.display = 'none';
+    totalCountAnswerInput.style.display = 'none';
+    equationLabel.style.display = 'none';
+    equationAnswerInput.style.display = 'none';
+}
+</script>
+</body>
+</html>
+ 
